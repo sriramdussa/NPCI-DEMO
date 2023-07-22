@@ -33,10 +33,32 @@ async function createUser(name, email, hashedPassword) {
   }
 }
 
+async function createUsersTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        e_balance DECIMAL(10, 2) DEFAULT 0.00
+      )
+    `);
+    console.log('Users table created successfully');
+  } catch (error) {
+    console.error('Error creating users table:', error);
+    throw error;
+  }
+}
+
+createUsersTable();
+
+
 // Endpoint to handle user registration
 app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    
 
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(password, saltRounds);
